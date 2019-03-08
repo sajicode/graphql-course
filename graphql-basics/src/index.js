@@ -5,27 +5,31 @@ import {
 // Type definitions (Schema)
 const typeDefs = `
   type Query {
-    hello: String!
+    id: ID!
     name: String!
-    location: String!
-    bio: String!
+    age: Int!
+    employed: Boolean!
+    gpa: Float
   }
 `;
 
 // Resolvers
 const resolvers = {
   Query: {
-    hello() {
-      return "This is the first query. Perfect!";
+    id() {
+      return "abc123"
     },
     name() {
-      return 'Maximus Meridius';
+      return "I am a string"
     },
-    location() {
-      return 'Lagos, Nigeria'
+    age() {
+      return 24
     },
-    bio() {
-      return 'Curious late bloomer'
+    employed() {
+      return false
+    },
+    gpa() {
+      return 4.30
     }
   }
 };
