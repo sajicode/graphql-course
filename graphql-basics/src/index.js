@@ -1,8 +1,9 @@
-import { GraphQLServer } from "graphql-yoga";
+import {
+  GraphQLServer
+} from "graphql-yoga";
 
 // Remove later
-const users = [
-  {
+const users = [{
     id: "1",
     name: "Rex",
     email: "rex@hex.com",
@@ -22,25 +23,26 @@ const users = [
   }
 ];
 
-const posts = [
-  {
+const posts = [{
     id: "01",
     title: "Lofty Heights",
     body: "O the escapades of man, for they are but mini-gods",
-    published: "02-25-1992"
+    published: "02-25-1992",
+    author: '1'
   },
   {
     id: "02",
     title: "Lowly Plains",
-    body:
-      "But bring down yourselves o lowly man, for you are but servants in the garden of the most high",
-    published: "02-28-1992"
+    body: "But bring down yourselves o lowly man, for you are but servants in the garden of the most high",
+    published: "02-28-1992",
+    author: '1'
   },
   {
     id: "03",
     title: "Tender Hills",
     body: "Little actions, thoughtful thoughts",
-    published: "02-29-1992"
+    published: "02-29-1992",
+    author: '2'
   }
 ];
 
@@ -58,6 +60,7 @@ const typeDefs = `
     name: String!
     email: String!
     age: Int
+    posts: [Post!]!
   }
 
   type Post {
@@ -65,6 +68,7 @@ const typeDefs = `
     title: String!
     body: String!
     published: String!
+    author: User!
   }
 `;
 
@@ -75,8 +79,8 @@ const resolvers = {
       if (!args.query) return posts;
       return posts.filter(
         post =>
-          post.title.toLowerCase().includes(args.query.toLowerCase()) ||
-          post.body.toLowerCase().includes(args.query.toLowerCase())
+        post.title.toLowerCase().includes(args.query.toLowerCase()) ||
+        post.body.toLowerCase().includes(args.query.toLowerCase())
       );
     },
     users(parent, args, ctx, info) {
@@ -100,6 +104,16 @@ const resolvers = {
         body: "Que sera sera, whatever will be will be",
         published: "03-06-2019"
       };
+    }
+  },
+  Post: {
+    author(parent, args, ctx, info) {
+      return users.find(user => user.id === parent.author)
+    }
+  },
+  User: {
+    posts(parent, args, ctx, info) {
+      return posts.filter(post => post.author === parent.id)
     }
   }
 };
