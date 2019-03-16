@@ -127,7 +127,8 @@ const Mutation = {
   },
 
   createComment(parent, args, {
-    db
+    db,
+    pubsub
   }, info) {
     const userExists = db.users.some(user => user.id === args.data.author);
     const postExists = db.posts.some(post => post.id === args.data.post && post.published)
@@ -141,6 +142,10 @@ const Mutation = {
     };
 
     db.comments.push(comment);
+    // pubsub.publish takes in the channel name and a property which matches the subscription name and the value being the latest update e.g. const comment
+    pubsub.publish(`comment ${args.data.post}`, {
+      comment
+    });
 
     return comment;
   },
