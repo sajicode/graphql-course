@@ -22,21 +22,21 @@ const posts = [{
     id: "01",
     title: "Lofty Heights",
     body: "O the escapades of man, for they are but mini-gods",
-    published: "02-25-1992",
+    published: true,
     author: '1'
   },
   {
     id: "02",
     title: "Lowly Plains",
     body: "But bring down yourselves o lowly man, for you are but servants in the garden of the most high",
-    published: "02-28-1992",
+    published: false,
     author: '1'
   },
   {
     id: "03",
     title: "Tender Hills",
     body: "Little actions, thoughtful thoughts",
-    published: "02-29-1992",
+    published: true,
     author: '2'
   }
 ];
