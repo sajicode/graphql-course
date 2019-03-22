@@ -10,6 +10,14 @@ const prisma = new Prisma({
 // async await method
 
 const createPostForUser = async (authorId, data) => {
+  const userExists = await prisma.exists.User({
+    id: authorId
+  });
+
+  if (!userExists) {
+    throw new Error("User not found");
+  }
+
   const post = await prisma.mutation.createPost(
     {
       data: {
@@ -21,25 +29,19 @@ const createPostForUser = async (authorId, data) => {
         }
       }
     },
-    "{ id }"
-  );
-  const user = await prisma.query.user(
-    {
-      where: {
-        id: authorId
-      }
-    },
-    "{id name email posts { id title published }}"
+    "{ author { id name email posts { id title published } } }"
   );
 
-  return user;
+  return post.author;
 };
 
 // createPostForUser("cjtd81lq700460723bpjakjxb", {
 //   title: "Great books to read",
 //   body: "War and Peace",
 //   published: true
-// }).then(user => console.log(JSON.stringify(user, undefined, 2)));
+// })
+//   .then(user => console.log(JSON.stringify(user, undefined, 2)))
+//   .catch(error => console.log(error.message));
 
 // prisma.mutation
 //   .createPost(
@@ -65,6 +67,12 @@ const createPostForUser = async (authorId, data) => {
 
 // async await method for below
 const updatePostForUser = async (postId, data) => {
+  const postExists = await prisma.exists.Post({
+    id: postId
+  });
+
+  if (!postExists) throw new Error("Post not found");
+
   const post = await prisma.mutation.updatePost(
     {
       where: {
@@ -72,23 +80,17 @@ const updatePostForUser = async (postId, data) => {
       },
       data
     },
-    "{ author {id} }"
+    "{ author {id name email posts {id title published}} }"
   );
 
-  const user = await prisma.query.user(
-    {
-      where: {
-        id: post.author.id
-      }
-    },
-    "{id name email posts {id title published}}"
-  );
-  return user;
+  return post.author;
 };
 
 updatePostForUser("cjtkis4vy00040784okx19ipb", {
-  published: false
-}).then(user => console.log(JSON.stringify(user, null, 2)));
+  published: true
+})
+  .then(user => console.log(JSON.stringify(user, null, 2)))
+  .catch(error => console.log(error.message));
 
 // prisma.mutation
 //   .updatePost(
