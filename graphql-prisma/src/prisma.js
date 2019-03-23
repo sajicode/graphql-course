@@ -86,11 +86,11 @@ const updatePostForUser = async (postId, data) => {
   return post.author;
 };
 
-updatePostForUser("cjtkis4vy00040784okx19ipb", {
-  published: true
-})
-  .then(user => console.log(JSON.stringify(user, null, 2)))
-  .catch(error => console.log(error.message));
+// updatePostForUser("cjtkis4vy00040784okx19ipb", {
+//   published: true
+// })
+//   .then(user => console.log(JSON.stringify(user, null, 2)))
+//   .catch(error => console.log(error.message));
 
 // prisma.mutation
 //   .updatePost(
