@@ -1,3 +1,22 @@
 type User {
   id: ID! @unique
+  username: String! @unique
+  books: [Book!]! @relation(name: "BookToUser", onDelete: CASCADE)
+  reviews: [Review!]! @relation(name: "ReviewToUser", onDelete: CASCADE)
+}
+
+type Book {
+  id: ID! @unique
+  title: String!
+  isbn: String!
+  author: User! @relation(name: "BookToUser", onDelete: SET_NULL)
+  reviews: [Review!]! @relation(name: "ReviewToBook", onDelete: CASCADE)
+}
+
+type Review {
+  id: String!
+  text: String!
+  rating: Integer!
+  author: User! @relation(name: "ReviewToUser", onDelete: SET_NULL)
+  book: Book! @relation(name: "ReviewToBook", onDelete: SET_NULL)
 }
