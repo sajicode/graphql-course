@@ -1,22 +1,27 @@
 const Query = {
-  posts(parent, args, {
-    db
-  }, info) {
-    if (!args.query) return db.posts;
-    return db.posts.filter(
-      post =>
-      post.title.toLowerCase().includes(args.query.toLowerCase()) ||
-      post.body.toLowerCase().includes(args.query.toLowerCase())
-    );
-  },
   users(parent, args, {
-    db
+    db,
+    prisma
   }, info) {
-    if (!args.query) return db.users;
-    return db.users.filter(user =>
-      user.name.toLowerCase().includes(args.query.toLowerCase())
-    );
+    return prisma.query.users(null, info)
+    // if (!args.query) return db.users;
+    // return db.users.filter(user =>
+    //   user.name.toLowerCase().includes(args.query.toLowerCase())
+    // );
   },
+  posts(parent, args, {
+    db,
+    prisma
+  }, info) {
+    return prisma.query.posts(null, info)
+    // if (!args.query) return db.posts;
+    // return db.posts.filter(
+    //   post =>
+    //   post.title.toLowerCase().includes(args.query.toLowerCase()) ||
+    //   post.body.toLowerCase().includes(args.query.toLowerCase())
+    // );
+  },
+
   me() {
     return {
       id: "12ee6",
