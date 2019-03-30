@@ -1,11 +1,13 @@
 const Query = {
-  users(parent, args, { db, prisma }, info) {
+  users(parent, args, {
+    db,
+    prisma
+  }, info) {
     const opArgs = {};
 
     if (args.query) {
       opArgs.where = {
-        OR: [
-          {
+        OR: [{
             name_contains: args.query
           },
           {
@@ -20,13 +22,15 @@ const Query = {
     //   user.name.toLowerCase().includes(args.query.toLowerCase())
     // );
   },
-  posts(parent, args, { db, prisma }, info) {
+  posts(parent, args, {
+    db,
+    prisma
+  }, info) {
     const opArgs = {};
 
     if (args.query) {
       opArgs.where = {
-        OR: [
-          {
+        OR: [{
             title_contains: args.query
           },
           {
@@ -60,9 +64,16 @@ const Query = {
       published: "03-06-2019"
     };
   },
-  comments(parent, args, { db }, info) {
-    return db.comments;
+  comments(parent, args, {
+    db,
+    prisma
+  }, info) {
+
+    return prisma.query.comments(null, info);
   }
 };
 
-export { Query as default };
+export {
+  Query as
+  default
+};
