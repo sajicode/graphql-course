@@ -86,79 +86,54 @@ const Mutation = {
   }, info) {
     return prisma.mutation.updatePost({
       where: {
-        id: args.id
+        id: id
       },
-      data: args.data
+      data: data
     }, info)
   },
 
   createComment(parent, args, {
-    db,
-    pubsub
+    prisma
   }, info) {
-    const userExists = db.users.some(user => user.id === args.data.author);
-    const postExists = db.posts.some(post => post.id === args.data.post && post.published)
-
-    if (!userExists) throw new Error("User not found");
-    if (!postExists) throw new Error("Post not found");
-
-    const comment = {
-      id: uuidv4(),
-      ...args.data
-    };
-
-    db.comments.push(comment);
-    // pubsub.publish takes in the channel name and a property which matches the subscription name and the value being the latest update e.g. const comment
-    pubsub.publish(`comment ${args.data.post}`, {
-      comment: {
-        mutation: 'CREATED',
-        data: comment
+    return prisma.createComment({
+      data: {
+        text: args.data.text,
+        author: {
+          connect: {
+            id: args.data.author
+          }
+        },
+        post: {
+          connect: {
+            id: args.data.post
+          }
+        }
       }
-    });
-
-    return comment;
+    }, info)
   },
 
   deleteComment(parent, args, {
-    db,
-    pubsub
+    prisma
   }, info) {
-    const commentIndex = db.comments.findIndex(comment => comment.id === args.id);
-
-    if (commentIndex === -1) throw new Error("Comment not found");
-
-    const [deletedComment] = db.comments.splice(commentIndex, 1);
-
-    pubsub.publish(`comment ${deletedComment.post}`, {
-      comment: {
-        mutation: "DELETED",
-        data: deletedComment
+    return prisma.mutation.deleteComment({
+      where: {
+        id: args.id
       }
-    });
-
-    return deletedComment;
+    }, info)
   },
 
   updateComment(parent, {
     id,
     data
   }, {
-    db,
-    pubsub
+    prisma
   }, info) {
-    const comment = db.comments.find(comment => comment.id === id);
-
-    if (!comment) throw new Error("Comment not found");
-
-    if (typeof data.text === "string") comment.text = data.text;
-
-    pubsub.publish(`comment ${comment.post}`, {
-      comment: {
-        mutation: 'UPDATED',
-        data: comment
-      }
-    })
-    return comment;
+    return prisma.mutation.updateComment({
+      where: {
+        id: id
+      },
+      data: data
+    }, info)
   }
 };
 
