@@ -4,11 +4,13 @@ const Mutation = {
   async createUser(parent, args, {
     prisma
   }, info) {
-    const emailTaken = await prisma.exists.User({
-      email: args.data.email
-    });
+    // const emailTaken = await prisma.exists.User({
+    //   email: args.data.email
+    // });
 
-    if (emailTaken) throw new Error("Email taken");
+    // if (emailTaken) throw new Error("Email taken");
+
+    // code above not necessary, left for reference sake
 
     // info ensures that whatever selection set was asked for comes back
     const user = await prisma.mutation.createUser({
@@ -21,11 +23,13 @@ const Mutation = {
   async deleteUser(parent, args, {
     prisma
   }, info) {
-    const userExists = await prisma.exists.User({
-      id: args.id
-    });
+    // const userExists = await prisma.exists.User({
+    //   id: args.id
+    // });
 
-    if (!userExists) throw new Error("User not found");
+    // if (!userExists) throw new Error("User not found");
+
+    // code above not necessary, left for reference sake
 
     return await prisma.mutation.deleteUser({
       where: {
@@ -35,60 +39,53 @@ const Mutation = {
   },
 
   updateUser(parent, args, {
-    db
+    prisma
   }, info) {
-    const {
-      id,
-      data
-    } = args;
-    const user = db.users.find(user => user.id === id);
-
-    if (!user) throw new Error("User not found");
-
-    if (typeof data.email === 'string') {
-      const emailTaken = db.users.some(user => user.email === data.email);
-
-      if (emailTaken) throw new Error("Email Taken");
-
-      user.email = data.email;
-    }
-
-    if (typeof data.name === 'string') {
-      user.name = data.name;
-    }
-
-    if (typeof data.age !== undefined) {
-      user.age = data.age;
-    }
-
-    return user;
+    return prisma.mutation.updateUser({
+      where: {
+        id: args.id
+      },
+      data: args.data
+    }, info)
   },
 
   createPost(parent, args, {
-    db,
-    pubsub
+    prisma,
   }, info) {
-    const userExists = db.users.some(user => user.id === args.data.author)
 
-    if (!userExists) throw new Error("User not found");
-
-    const post = {
-      id: uuidv4(),
-      ...args.data
-    };
-
-    db.posts.push(post);
-
-    if (args.data.published) {
-      pubsub.publish(`post`, {
-        post: {
-          mutation: 'CREATED',
-          data: post
+    return prisma.mutation.createPost({
+      data: {
+        title: args.data.title,
+        body: args.data.body,
+        published: args.data.published,
+        author: {
+          connect: {
+            id: args.data.author
+          }
         }
-      });
-    }
+      }
+    }, info)
+    // const userExists = db.users.some(user => user.id === args.data.author)
 
-    return post;
+    // if (!userExists) throw new Error("User not found");
+
+    // const post = {
+    //   id: uuidv4(),
+    //   ...args.data
+    // };
+
+    // db.posts.push(post);
+
+    // if (args.data.published) {
+    //   pubsub.publish(`post`, {
+    //     post: {
+    //       mutation: 'CREATED',
+    //       data: post
+    //     }
+    //   });
+    // }
+
+    // return post;
   },
 
   deletePost(parent, args, {
