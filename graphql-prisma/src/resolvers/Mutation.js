@@ -1,21 +1,24 @@
-import uuidv4 from 'uuid/v4';
+import bcrypt from 'bcryptjs';
+
+// Take in password => validate password => Hash password => Generate auth token
 
 const Mutation = {
   async createUser(parent, args, {
     prisma
   }, info) {
-    // const emailTaken = await prisma.exists.User({
-    //   email: args.data.email
-    // });
+    if (args.data.password.length < 8) {
+      throw new Error("Password must be 8 characters or longer")
+    }
 
-    // if (emailTaken) throw new Error("Email taken");
-
-    // code above not necessary, left for reference sake
+    const password = await bcrypt.hash(args.data.password, 10)
 
     // info ensures that whatever selection set was asked for comes back
     const user = await prisma.mutation.createUser({
-      data: args.data
-    }, info)
+      data: {
+        ...args.data,
+        password
+      }
+    }, info);
 
     return user;
   },
