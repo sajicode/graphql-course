@@ -127,7 +127,7 @@ const Mutation = {
       author: {
         id: userId
       }
-    });
+    }, info);
 
     if (!postExists) throw new Error("Unable to delete post");
 
@@ -140,12 +140,24 @@ const Mutation = {
     );
   },
 
-  updatePost(parent, {
+  async updatePost(parent, {
     id,
     data
   }, {
-    prisma
+    prisma,
+    request
   }, info) {
+    const userId = getUserId(request);
+
+    const postExists = await prisma.exists.Post({
+      id: id,
+      author: {
+        id: userId
+      }
+    }, info);
+
+    if (!postExists) throw new Error("Unable to find post");
+
     return prisma.mutation.updatePost({
         where: {
           id: id
@@ -157,14 +169,17 @@ const Mutation = {
   },
 
   createComment(parent, args, {
-    prisma
+    prisma,
+    request
   }, info) {
-    return prisma.createComment({
+    const userId = getUserId(request);
+
+    return prisma.mutation.createComment({
         data: {
           text: args.data.text,
           author: {
             connect: {
-              id: args.data.author
+              id: userId
             }
           },
           post: {
@@ -178,9 +193,22 @@ const Mutation = {
     );
   },
 
-  deleteComment(parent, args, {
-    prisma
+  async deleteComment(parent, args, {
+    prisma,
+    request
   }, info) {
+
+    const userId = getUserId(request);
+
+    const commentExists = await prisma.exists.Comment({
+      id: args.id,
+      author: {
+        id: userId
+      }
+    }, info);
+
+    if (!commentExists) throw new Error("Unable to find comment");
+
     return prisma.mutation.deleteComment({
         where: {
           id: args.id
@@ -190,12 +218,25 @@ const Mutation = {
     );
   },
 
-  updateComment(parent, {
+  async updateComment(parent, {
     id,
     data
   }, {
-    prisma
+    prisma,
+    request
   }, info) {
+
+    const userId = getUserId(request);
+
+    const commentExists = await prisma.exists.Comment({
+      id: id,
+      author: {
+        id: userId
+      }
+    }, info);
+
+    if (!commentExists) throw new Error("Unable to find comment");
+
     return prisma.mutation.updateComment({
         where: {
           id: id
