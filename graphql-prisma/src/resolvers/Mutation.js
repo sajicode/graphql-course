@@ -1,10 +1,13 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import getUserId from '../utils/getUserId';
 
 // Take in password => validate password => Hash password => Generate auth token(JWT)
 
 const Mutation = {
-  async login(parent, args, { prisma }, info) {
+  async login(parent, args, {
+    prisma
+  }, info) {
     const user = await prisma.query.user({
       where: {
         email: args.data.email
@@ -19,11 +22,15 @@ const Mutation = {
 
     return {
       user,
-      token: jwt.sign({ userId: user.id }, "whatsecretis?")
+      token: jwt.sign({
+        userId: user.id
+      }, "whatsecretis?")
     };
   },
 
-  async createUser(parent, args, { prisma }, info) {
+  async createUser(parent, args, {
+    prisma
+  }, info) {
     if (args.data.password.length < 8) {
       throw new Error("Password must be 8 characters or longer");
     }
@@ -40,8 +47,7 @@ const Mutation = {
 
     return {
       user,
-      token: jwt.sign(
-        {
+      token: jwt.sign({
           userId: user.id
         },
         "whatsecretis?"
@@ -49,7 +55,9 @@ const Mutation = {
     };
   },
 
-  async deleteUser(parent, args, { prisma }, info) {
+  async deleteUser(parent, args, {
+    prisma
+  }, info) {
     // const userExists = await prisma.exists.User({
     //   id: args.id
     // });
@@ -58,8 +66,7 @@ const Mutation = {
 
     // code above not necessary, left for reference sake
 
-    return await prisma.mutation.deleteUser(
-      {
+    return await prisma.mutation.deleteUser({
         where: {
           id: args.id
         }
@@ -68,9 +75,10 @@ const Mutation = {
     );
   },
 
-  updateUser(parent, args, { prisma }, info) {
-    return prisma.mutation.updateUser(
-      {
+  updateUser(parent, args, {
+    prisma
+  }, info) {
+    return prisma.mutation.updateUser({
         where: {
           id: args.id
         },
@@ -80,16 +88,21 @@ const Mutation = {
     );
   },
 
-  createPost(parent, args, { prisma }, info) {
-    return prisma.mutation.createPost(
-      {
+  createPost(parent, args, {
+    prisma,
+    request
+  }, info) {
+
+    const userId = getUserId(request)
+    //get the header value, parse out the token, verify...
+    return prisma.mutation.createPost({
         data: {
           title: args.data.title,
           body: args.data.body,
           published: args.data.published,
           author: {
             connect: {
-              id: args.data.author
+              id: userId
             }
           }
         }
@@ -98,9 +111,10 @@ const Mutation = {
     );
   },
 
-  async deletePost(parent, args, { prisma }, info) {
-    return await prisma.mutation.deletePost(
-      {
+  async deletePost(parent, args, {
+    prisma
+  }, info) {
+    return await prisma.mutation.deletePost({
         where: {
           id: args.id
         }
@@ -109,9 +123,13 @@ const Mutation = {
     );
   },
 
-  updatePost(parent, { id, data }, { prisma }, info) {
-    return prisma.mutation.updatePost(
-      {
+  updatePost(parent, {
+    id,
+    data
+  }, {
+    prisma
+  }, info) {
+    return prisma.mutation.updatePost({
         where: {
           id: id
         },
@@ -121,9 +139,10 @@ const Mutation = {
     );
   },
 
-  createComment(parent, args, { prisma }, info) {
-    return prisma.createComment(
-      {
+  createComment(parent, args, {
+    prisma
+  }, info) {
+    return prisma.createComment({
         data: {
           text: args.data.text,
           author: {
@@ -142,9 +161,10 @@ const Mutation = {
     );
   },
 
-  deleteComment(parent, args, { prisma }, info) {
-    return prisma.mutation.deleteComment(
-      {
+  deleteComment(parent, args, {
+    prisma
+  }, info) {
+    return prisma.mutation.deleteComment({
         where: {
           id: args.id
         }
@@ -153,9 +173,13 @@ const Mutation = {
     );
   },
 
-  updateComment(parent, { id, data }, { prisma }, info) {
-    return prisma.mutation.updateComment(
-      {
+  updateComment(parent, {
+    id,
+    data
+  }, {
+    prisma
+  }, info) {
+    return prisma.mutation.updateComment({
         where: {
           id: id
         },
@@ -166,4 +190,7 @@ const Mutation = {
   }
 };
 
-export { Mutation as default };
+export {
+  Mutation as
+  default
+};
