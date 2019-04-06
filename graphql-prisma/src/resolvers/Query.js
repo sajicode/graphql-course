@@ -24,22 +24,49 @@ const Query = {
     //   user.name.toLowerCase().includes(args.query.toLowerCase())
     // );
   },
+
+  myPosts(parent, args, {
+    prisma,
+    request
+  }, info) {
+    const userId = getUserId(request);
+    const opArgs = {
+      where: {
+        author: {
+          id: userId
+        }
+      }
+    }
+
+    if (args.query) {
+      opArgs.where.OR = [{
+        title_contains: args.query
+      }, {
+        body_contains: args.query
+      }]
+    }
+
+    return prisma.query.posts(opArgs, info);
+  },
+
   posts(parent, args, {
     db,
     prisma
   }, info) {
-    const opArgs = {};
+    const opArgs = {
+      where: {
+        published: true
+      }
+    };
 
     if (args.query) {
-      opArgs.where = {
-        OR: [{
-            title_contains: args.query
-          },
-          {
-            body_contains: args.query
-          }
-        ]
-      };
+      opArgs.where.OR = [{
+          title_contains: args.query
+        },
+        {
+          body_contains: args.query
+        }
+      ]
     }
     return prisma.query.posts(opArgs, info);
     // if (!args.query) return db.posts;
