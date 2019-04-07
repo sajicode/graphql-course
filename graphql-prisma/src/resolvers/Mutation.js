@@ -154,7 +154,22 @@ const Mutation = {
       author: {
         id: userId
       }
-    }, info);
+    });
+
+    const isPublished = await prisma.exists.Post({
+      id: id,
+      published: true
+    });
+
+    if (isPublished && data.published === false) {
+      await prisma.mutation.deleteManyComments({
+        where: {
+          post: {
+            id: id
+          }
+        }
+      });
+    }
 
     if (!postExists) throw new Error("Unable to find post");
 
