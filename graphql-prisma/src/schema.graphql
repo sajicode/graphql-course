@@ -1,7 +1,7 @@
 type Query {
-  posts(query: String): [Post!]!
+  posts(query: String, first: Int, skip: Int): [Post!]!
   myPosts(query: String): [Post!]!
-  users(query: String): [User!]!
+  users(query: String, first: Int, skip: Int): [User!]!
   comments: [Comment]!
   me: User!
   post(id: ID!): Post!

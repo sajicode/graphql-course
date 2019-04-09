@@ -5,7 +5,10 @@ const Query = {
     db,
     prisma
   }, info) {
-    const opArgs = {};
+    const opArgs = {
+      first: args.first,
+      skip: args.skip
+    };
 
     if (args.query) {
       opArgs.where = {
@@ -56,7 +59,9 @@ const Query = {
     const opArgs = {
       where: {
         published: true
-      }
+      },
+      first: args.first,
+      skip: args.skip
     };
 
     if (args.query) {
