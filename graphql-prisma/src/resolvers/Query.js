@@ -39,7 +39,10 @@ const Query = {
         author: {
           id: userId
         }
-      }
+      },
+      first: args.first,
+      skip: args.skip,
+      after: args.after
     }
 
     if (args.query) {
@@ -124,8 +127,12 @@ const Query = {
     db,
     prisma
   }, info) {
-
-    return prisma.query.comments(null, info);
+    const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after
+    }
+    return prisma.query.comments(opArgs, info);
   }
 };
 
